@@ -44,7 +44,8 @@ export async function POST(req: NextRequest) {
         console.log("API: Initializing GoogleGenAI");
         const ai = new GoogleGenAI({ apiKey });
         // Use the model name that was proven to work in the user's test script
-        const model = "gemini-flash-latest";
+        console.log("API: Using model gemini-2.0-flash-lite");
+        const model = "gemini-2.0-flash-lite";
 
         const contents = [
             {

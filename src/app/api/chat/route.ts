@@ -5,9 +5,15 @@ import path from 'path';
 
 export async function POST(req: NextRequest) {
     try {
-        const { messages, emotion, descriptors } = await req.json();
+        console.log("🔥 [Chat API] Request Received");
+        const body = await req.json();
+        console.log("🔥 [Chat API] Parsed Body Keys:", Object.keys(body));
+        const { messages, emotion, descriptors } = body;
+
+        console.log(`🔥 [Chat API] Emotion: ${emotion}, Msg Count: ${messages?.length}`);
 
         if (!messages || !Array.isArray(messages)) {
+            console.error("🔥 [Chat API] Error: Messages array missing");
             return NextResponse.json({ error: 'Messages array is required' }, { status: 400 });
         }
 

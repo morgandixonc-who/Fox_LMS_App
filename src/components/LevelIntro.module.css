@@ -1,0 +1,281 @@
+/* Glassmorphism Overlay */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(10, 10, 20, 0.6);
+    /* Deep dark blue tint */
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    font-family: 'Inter', sans-serif;
+    perspective: 1200px;
+    opacity: 0;
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+/* Container for the animation machinery */
+.stage {
+    position: relative;
+    width: 400px;
+    height: 400px;
+    margin-bottom: 2rem;
+    filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.5));
+}
+
+/* --- Buckets --- */
+.bucketWrapper {
+    position: absolute;
+    top: 20px;
+    z-index: 20;
+    transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.bucketLeft {
+    left: 20px;
+    transform-origin: 20% 20%;
+}
+
+.bucketRight {
+    right: 20px;
+    transform-origin: 80% 20%;
+}
+
+.pourLeft {
+    animation: rotateLeft 3.5s cubic-bezier(0.45, 0, 0.55, 1) forwards;
+}
+
+.pourRight {
+    animation: rotateRight 3.5s cubic-bezier(0.45, 0, 0.55, 1) forwards;
+}
+
+/* Paint Stream */
+.stream {
+    position: absolute;
+    width: 16px;
+    top: 60px;
+    height: 0;
+    background: var(--stream-color);
+    border-radius: 8px;
+    z-index: 15;
+    opacity: 0.9;
+    filter: drop-shadow(0 0 8px var(--stream-color));
+}
+
+.streamLeft {
+    left: 35px;
+    transform: rotate(-12deg);
+}
+
+.streamRight {
+    right: 35px;
+    transform: rotate(12deg);
+}
+
+.flowing {
+    animation: flow 2.5s ease-in-out forwards;
+    animation-delay: 0.6s;
+}
+
+/* --- Blender --- */
+.blenderWrapper {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 160px;
+    height: 220px;
+    z-index: 10;
+}
+
+.blenderShake {
+    animation: machineShake 2.5s infinite linear;
+}
+
+/* Liquid inside blender */
+.liquidLevel {
+    transform-origin: bottom;
+    transform: scaleY(0);
+    transition: transform 3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fillUp {
+    transform: scaleY(1);
+}
+
+/* --- Content Reveal --- */
+.content {
+    text-align: center;
+    color: white;
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+    transition: opacity 1s ease-out, transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.title {
+    font-size: 4rem;
+    font-weight: 900;
+    margin: 0.5rem 0;
+    background: linear-gradient(135deg, #fff 20%, var(--target-color) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 20px var(--target-color));
+    letter-spacing: -0.02em;
+}
+
+.subtitle {
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 0.5rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Button */
+.button {
+    margin-top: 2.5rem;
+    padding: 16px 48px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 9999px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.button:hover {
+    background: white;
+    color: var(--target-color);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 15px 40px rgba(255, 255, 255, 0.2), 0 0 20px var(--target-color);
+}
+
+.button:active {
+    transform: translateY(0) scale(0.98);
+}
+
+/* --- Animations --- */
+
+@keyframes rotateLeft {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    15% {
+        transform: rotate(-55deg);
+    }
+
+    /* Rapid pour */
+    75% {
+        transform: rotate(-55deg);
+    }
+
+    /* Hold */
+    100% {
+        transform: rotate(0deg);
+    }
+
+    /* Return */
+}
+
+@keyframes rotateRight {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    15% {
+        transform: rotate(55deg);
+    }
+
+    /* Rapid pour */
+    75% {
+        transform: rotate(55deg);
+    }
+
+    /* Hold */
+    100% {
+        transform: rotate(0deg);
+    }
+
+    /* Return */
+}
+
+@keyframes flow {
+    0% {
+        height: 0;
+        opacity: 0;
+    }
+
+    10% {
+        height: 180px;
+        opacity: 1;
+    }
+
+    80% {
+        height: 180px;
+        opacity: 1;
+        top: 60px;
+    }
+
+    100% {
+        height: 0;
+        opacity: 0;
+        top: 240px;
+        /* Disappear down */
+    }
+}
+
+@keyframes machineShake {
+    0% {
+        transform: translateX(-50%) rotate(0deg);
+    }
+
+    10% {
+        transform: translateX(-51%) rotate(-2deg);
+    }
+
+    30% {
+        transform: translateX(-49%) rotate(2deg);
+    }
+
+    50% {
+        transform: translateX(-52%) rotate(-1deg);
+    }
+
+    70% {
+        transform: translateX(-48%) rotate(1deg);
+    }
+
+    90% {
+        transform: translateX(-50%) rotate(0deg);
+    }
+
+    100% {
+        transform: translateX(-50%) rotate(0deg);
+    }
+}

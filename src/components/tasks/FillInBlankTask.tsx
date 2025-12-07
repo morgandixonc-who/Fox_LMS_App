@@ -4,12 +4,24 @@ interface FillInBlankTaskProps {
     question: string;
     correct_answer: string;
     options?: string[]; // Made optional for backward compatibility, but system prompt should provide it
+    onComplete?: (success: boolean) => void;
 }
 
-export default function FillInBlankTask({ question, correct_answer, options = [] }: FillInBlankTaskProps) {
+export default function FillInBlankTask({ question, correct_answer, options = [], onComplete }: FillInBlankTaskProps) {
     const [selectedWord, setSelectedWord] = useState<string | null>(null);
     const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
     const [shuffledOptions, setShuffledOptions] = useState<string[]>([]);
+
+    // ... useEffect ...
+
+    // We can't use replace_file_content to keep the useEffect if we rewrite the function signature...
+    // Actually I will just replace the top part and let the rest be.
+    // Wait, I need to be careful with the lines.
+    // The previous view_file showed useEffect lines 14-23.
+    // I will replace lines 3-37 (Props def + Function Def + handleWordClick)
+
+    // Wait, I need to keep the useEffect implementation or include it.
+    // Since I can't easily merge blocks without careful line counts, I will include the useEffect.
 
     useEffect(() => {
         // Fallback if options aren't provided by API yet
@@ -29,6 +41,7 @@ export default function FillInBlankTask({ question, correct_answer, options = []
         // Immediate check
         if (word.toLowerCase() === correct_answer.toLowerCase()) {
             setIsCorrect(true);
+            if (onComplete) setTimeout(() => onComplete(true), 1500);
         } else {
             setIsCorrect(false);
             // Optional: Auto-clear incorrect after delay? 
@@ -132,19 +145,52 @@ export default function FillInBlankTask({ question, correct_answer, options = []
                 })}
             </div>
 
-            {/* Feedback Message */}
-            {isCorrect !== null && (
+            {/* Feedback Overlay */}
+            {isCorrect === true && (
+                <div style={{
+                    position: 'absolute',
+                    top: 0, left: 0, right: 0, bottom: 0,
+                    background: 'rgba(255, 255, 255, 0.9)',
+                    backdropFilter: 'blur(5px)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: '24px',
+                    zIndex: 100,
+                    animation: 'fadeIn 0.3s ease'
+                }}>
+                    <div style={{ fontSize: '5rem', marginBottom: '20px', animation: 'bounce 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)' }}>
+                        🎯
+                    </div>
+                    <div style={{
+                        fontSize: '2.5rem',
+                        fontWeight: '900',
+                        color: '#059669',
+                        textTransform: 'uppercase',
+                        letterSpacing: '2px',
+                        textShadow: '0 4px 10px rgba(16, 185, 129, 0.3)'
+                    }}>
+                        Perfect!
+                    </div>
+                    <div style={{ fontSize: '1.2rem', color: '#047857', marginTop: '10px', fontWeight: 'bold' }}>
+                        Sentence complete!
+                    </div>
+                </div>
+            )}
+
+            {isCorrect === false && (
                 <div style={{
                     marginTop: '25px',
                     textAlign: 'center',
                     padding: '12px',
                     borderRadius: '12px',
-                    background: isCorrect ? '#ecfdf5' : '#fef2f2',
-                    color: isCorrect ? '#065f46' : '#991b1b',
+                    background: '#fef2f2',
+                    color: '#991b1b',
                     fontWeight: 'bold',
                     animation: 'fadeIn 0.3s ease'
                 }}>
-                    {isCorrect ? '✨ Perfect match!' : '❌ Not quite. Tap the blank to clear and try again.'}
+                    ❌ Not quite. Tap the blank to clear and try again.
                 </div>
             )}
         </div>

@@ -3,12 +3,14 @@
 import { BiomeConfig } from '@/lib/biomes';
 import { BiomeComponents } from './biomes';
 import LevelNode from './LevelNode';
+import { getLevelColor } from '@/lib/levelColors';
 
 interface BiomeSectionProps {
     config: BiomeConfig;
+    onLevelClick?: (level: number) => void;
 }
 
-export default function BiomeSection({ config }: BiomeSectionProps) {
+export default function BiomeSection({ config, onLevelClick }: BiomeSectionProps) {
     // Look up the specific component from the registry
     const BiomeComponent = BiomeComponents[config.type];
 
@@ -31,9 +33,10 @@ export default function BiomeSection({ config }: BiomeSectionProps) {
                     key={level.id}
                     level={level.id}
                     status={level.status}
+                    color={getLevelColor(level.id)}
                     x={level.x}
                     y={config.height * (level.y / 100)}
-                    onClick={() => console.log(`Clicked level ${level.id}`)}
+                    onClick={() => onLevelClick?.(level.id)}
                 />
             ))}
 

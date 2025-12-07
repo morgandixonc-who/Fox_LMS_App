@@ -3,16 +3,22 @@ import React, { useState } from 'react';
 interface TrueFalseTaskProps {
     question: string;
     answer: boolean;
+    onComplete?: (success: boolean) => void;
 }
 
-export default function TrueFalseTask({ question, answer }: TrueFalseTaskProps) {
+export default function TrueFalseTask({ question, answer, onComplete }: TrueFalseTaskProps) {
     const [selected, setSelected] = useState<boolean | null>(null);
     const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
 
     const handleSelect = (val: boolean) => {
         if (isCorrect === true) return;
         setSelected(val);
-        setIsCorrect(val === answer);
+        const correct = val === answer;
+        setIsCorrect(correct);
+
+        if (onComplete) {
+            setTimeout(() => onComplete(correct), 1500);
+        }
     };
 
     return (
@@ -21,7 +27,9 @@ export default function TrueFalseTask({ question, answer }: TrueFalseTaskProps) 
             background: 'white',
             borderRadius: '24px',
             boxShadow: '0 10px 40px rgba(0,0,0,0.08)',
-            border: '1px solid #f3f4f6'
+            border: '1px solid #f3f4f6',
+            position: 'relative',
+            overflow: 'hidden'
         }}>
             <h3 style={{
                 color: '#be185d',
@@ -116,19 +124,53 @@ export default function TrueFalseTask({ question, answer }: TrueFalseTaskProps) 
                 </button>
             </div>
 
-            {selected !== null && (
+            {/* Feedback Overlay */}
+            {isCorrect === true && (
+                <div style={{
+                    position: 'absolute',
+                    top: 0, left: 0, right: 0, bottom: 0,
+                    background: 'rgba(255, 255, 255, 0.9)',
+                    backdropFilter: 'blur(5px)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: '24px',
+                    zIndex: 100,
+                    animation: 'fadeIn 0.3s ease'
+                }}>
+                    <div style={{ fontSize: '5rem', marginBottom: '20px', animation: 'bounce 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)' }}>
+                        ✨
+                    </div>
+                    <div style={{
+                        fontSize: '2.5rem',
+                        fontWeight: '900',
+                        color: '#059669',
+                        textTransform: 'uppercase',
+                        letterSpacing: '2px',
+                        textShadow: '0 4px 10px rgba(16, 185, 129, 0.3)'
+                    }}>
+                        Correct!
+                    </div>
+                    <div style={{ fontSize: '1.2rem', color: '#047857', marginTop: '10px', fontWeight: 'bold' }}>
+                        You got it!
+                    </div>
+                </div>
+            )}
+
+            {selected !== null && isCorrect === false && (
                 <div style={{
                     marginTop: '30px',
                     textAlign: 'center',
                     padding: '15px',
                     borderRadius: '12px',
-                    background: isCorrect ? '#ecfdf5' : '#fef2f2',
-                    color: isCorrect ? '#065f46' : '#991b1b',
+                    background: '#fef2f2',
+                    color: '#991b1b',
                     fontWeight: 'bold',
                     fontSize: '1.1rem',
                     animation: 'fadeIn 0.3s ease'
                 }}>
-                    {isCorrect ? '🎉 Correct Answer!' : '❌ Incorrect.'}
+                    ❌ Incorrect.
                 </div>
             )}
         </div>
