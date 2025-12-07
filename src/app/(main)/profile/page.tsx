@@ -46,7 +46,13 @@ export default function ProfilePage() {
                 }}>
                     <h3 style={{ fontSize: '1.5rem', marginBottom: '10px', color: 'var(--primary-dark)' }}>Fox Training Pro</h3>
                     <p style={{ marginBottom: '20px' }}>Unlock unlimited practice scenarios and advanced AI personas.</p>
-                    <button className="btn btn-primary" style={{ width: '100%' }}>Upgrade to Pro</button>
+                    <button
+                        className="btn btn-primary"
+                        style={{ width: '100%' }}
+                        onClick={() => router.push('/subscription')}
+                    >
+                        Upgrade to Pro
+                    </button>
                 </div>
             </div>
         </div>

@@ -36,6 +36,10 @@ export default function Sidebar() {
                     <Dumbbell size={32} strokeWidth={isActive('/practice') ? 3 : 2.5} />
                     <span className={styles.navText}>Practice</span>
                 </Link>
+                <Link href="/leaderboard" className={`${styles.navItem} ${isActive('/leaderboard') ? styles.navItemActive : ''}`}>
+                    <Trophy size={32} strokeWidth={isActive('/leaderboard') ? 3 : 2.5} />
+                    <span className={styles.navText}>Leaderboard</span>
+                </Link>
                 <Link href="/profile" className={`${styles.navItem} ${isActive('/profile') ? styles.navItemActive : ''}`}>
                     <User size={32} strokeWidth={isActive('/profile') ? 3 : 2.5} />
                     <span className={styles.navText}>Profile</span>
@@ -49,36 +53,63 @@ export default function Sidebar() {
             {/* Widgets in Sidebar */}
             <div className={styles.widgetContainer}>
                 {/* Streak */}
-                <div className={styles.widget}>
-                    <div className={styles.widgetHeader}>
-                        <span>Streak</span>
-                        <span style={{ color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                            <Flame size={20} fill="currentColor" /> 5
-                        </span>
+                <Link href="/streak" style={{ textDecoration: 'none', color: 'inherit' }}>
+                    <div className={styles.widget} style={{
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease'
+                    }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = 'translateY(-2px)';
+                            e.currentTarget.style.boxShadow = '0 4px 12px rgba(255,150,0,0.2)';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = 'translateY(0)';
+                            e.currentTarget.style.boxShadow = 'none';
+                        }}>
+                        <div className={styles.widgetHeader}>
+                            <span>Streak</span>
+                            <span style={{ color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <Flame size={20} fill="currentColor" /> 5
+                            </span>
+                        </div>
+                        {/* Simplified Streak Row for Sidebar */}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', fontWeight: 'bold', color: 'var(--text-light)' }}>
+                            <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
+                        </div>
                     </div>
-                    {/* Simplified Streak Row for Sidebar */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', fontWeight: 'bold', color: 'var(--text-light)' }}>
-                        <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
-                    </div>
-                </div>
+                </Link>
+
 
                 {/* Daily Quests */}
-                <div className={styles.widget}>
-                    <div className={styles.widgetHeader}>
-                        <span>Daily Quests</span>
-                    </div>
-                    <div className={styles.questItem}>
-                        <div className={styles.questIcon} style={{ backgroundColor: '#FFD700' }}>
-                            <Zap size={18} fill="white" color="white" />
+                <Link href="/quests" style={{ textDecoration: 'none', color: 'inherit' }}>
+                    <div className={styles.widget} style={{
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease'
+                    }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = 'translateY(-2px)';
+                            e.currentTarget.style.boxShadow = '0 4px 12px rgba(255,215,0,0.2)';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = 'translateY(0)';
+                            e.currentTarget.style.boxShadow = 'none';
+                        }}>
+                        <div className={styles.widgetHeader}>
+                            <span>Daily Quests</span>
                         </div>
-                        <div style={{ flex: 1 }}>
-                            <div style={{ fontSize: '0.9rem', fontWeight: 'bold' }}>Earn 50 XP</div>
-                            <div className={styles.progressBar}>
-                                <div className={styles.progressFill} style={{ width: '40%' }}></div>
+                        <div className={styles.questItem}>
+                            <div className={styles.questIcon} style={{ backgroundColor: '#FFD700' }}>
+                                <Zap size={18} fill="white" color="white" />
+                            </div>
+                            <div style={{ flex: 1 }}>
+                                <div style={{ fontSize: '0.9rem', fontWeight: 'bold' }}>Earn 50 XP</div>
+                                <div className={styles.progressBar}>
+                                    <div className={styles.progressFill} style={{ width: '40%' }}></div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </Link>
 
                 {/* League */}
                 <div className={styles.widget}>

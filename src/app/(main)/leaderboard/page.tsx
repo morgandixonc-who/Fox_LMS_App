@@ -67,26 +67,6 @@ export default function LeaderboardPage() {
                 animation: 'float 8s ease-in-out infinite reverse'
             }} />
 
-            {/* Company Logo in Top Left Corner */}
-            <div style={{
-                position: 'fixed',
-                top: '20px',
-                left: '20px',
-                zIndex: 101,
-                pointerEvents: 'auto'
-            }}>
-                <Image
-                    src={darkMode ? "/assets/logoflat-light.png" : "/assets/logoflat.png"}
-                    alt="Company Logo"
-                    width={200}
-                    height={70}
-                    style={{
-                        objectFit: 'contain',
-                        filter: 'drop-shadow(0 2px 8px rgba(255,150,0,0.3))'
-                    }}
-                />
-            </div>
-
             {/* Header */}
             <div style={{
                 textAlign: 'center',
