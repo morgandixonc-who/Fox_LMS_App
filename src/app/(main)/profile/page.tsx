@@ -19,17 +19,27 @@ export default function ProfilePage() {
                 }}>
                     <div style={{ marginBottom: '10px' }}>
                         <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '4px' }}>Username</label>
-                        <input
-                            defaultValue="DrFox"
-                            style={{ width: '100%', padding: '8px', borderRadius: '8px', border: '1px solid #ccc' }}
-                        />
+                        <div style={{
+                            width: '100%',
+                            padding: '8px',
+                            borderRadius: '8px',
+                            border: '1px solid var(--border-color)',
+                            backgroundColor: 'var(--surface-color)'
+                        }}>
+                            DrFox
+                        </div>
                     </div>
                     <div>
                         <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '4px' }}>Email</label>
-                        <input
-                            defaultValue="fox@example.com"
-                            style={{ width: '100%', padding: '8px', borderRadius: '8px', border: '1px solid #ccc' }}
-                        />
+                        <div style={{
+                            width: '100%',
+                            padding: '8px',
+                            borderRadius: '8px',
+                            border: '1px solid var(--border-color)',
+                            backgroundColor: 'var(--surface-color)'
+                        }}>
+                            fox@example.com
+                        </div>
                     </div>
                 </div>
             </div>
