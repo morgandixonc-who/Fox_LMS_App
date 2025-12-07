@@ -28,16 +28,13 @@ export default function DashboardPage() {
 
     return (
         <div style={{
-            width: '100%',
-            maxWidth: '100%',
-            paddingLeft: 'var(--sidebar-width)', // Push content by sidebar width
+            // Padding left handled by layout via sidebar-width
             textAlign: 'center',
             backgroundColor: '#f0fdf4',
             backgroundImage: `radial-gradient(#00a896 1px, transparent 1px)`,
             backgroundSize: '30px 30px',
             minHeight: '100vh',
             position: 'relative',
-            overflowX: 'hidden'
         }}>
 
             {/* Header */}
@@ -46,7 +43,7 @@ export default function DashboardPage() {
                 top: 20,
                 left: 0,
                 right: 0,
-                paddingLeft: 'var(--sidebar-width)', // Match main content padding to center relative to visual area
+                // paddingLeft handled by layout margin
                 zIndex: 90,
                 pointerEvents: 'none',
                 display: 'flex',

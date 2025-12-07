@@ -41,6 +41,19 @@
 
   --card-border-width: 2px;
   --card-shadow-depth: 4px;
+
+  --sidebar-width: 260px;
+
+  /* Semantic UI Colors */
+  --bg-sidebar: var(--white);
+  --bg-header: rgba(255, 255, 255, 0.95);
+  --bg-card: var(--white);
+  --bg-hero: #f0fdf4;
+  --bg-footer: #f0fdf4;
+  --surface-hover: #f7f7f7;
+
+  --nav-active-bg: #e0f2fe;
+  --nav-active-text: var(--secondary);
 }
 
 /* Dark Mode Overrides */
@@ -50,6 +63,18 @@
   --text-color: #e5e5e5;
   --text-light: #a0a0a0;
   --border-color: #37464f;
+
+  /* Semantic Overrides */
+  --bg-sidebar: #131f24;
+  --bg-header: rgba(19, 31, 36, 0.95);
+  --bg-card: #202f36;
+  --bg-hero: #0f181c;
+  --bg-footer: #0f181c;
+  --surface-hover: #2a3d46;
+
+  --nav-active-bg: #2a3d46;
+  --nav-active-text: #58CC02;
+  /* Check if contrast is okay, else lighten */
 }
 
 .dark-mode body {
@@ -108,6 +133,44 @@ a {
   max-width: 1024px;
   margin: 0 auto;
   padding: 0 20px;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --sidebar-width: 0px;
+    --btn-height: 44px;
+  }
+
+  .dark-mode {
+    --sidebar-width: 0px;
+  }
+
+}
+
+/* Main Layout Styles */
+.main-layout-container {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--bg-color);
+}
+
+.main-content {
+  margin-left: var(--sidebar-width);
+  flex: 1;
+  padding: 40px;
+  width: 100%;
+  position: relative;
+  transition: margin-left 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding: 16px;
+    /* Enable horizontal scrolling if content is wider than screen */
+    overflow-x: auto;
+    /* Ensure it takes full viewport width since sidebar is 0 width */
+    width: 100vw;
+  }
 }
 
 /* 3D Blocky Buttons */

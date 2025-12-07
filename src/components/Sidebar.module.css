@@ -6,13 +6,22 @@
     top: 0;
     border-right: 4px solid var(--border-color);
     /* Thicker border */
-    background-color: var(--white);
+    background-color: var(--bg-sidebar);
     padding: 24px 16px;
     display: flex;
     flex-direction: column;
     z-index: 100;
     overflow-y: auto;
     gap: 20px;
+    transition: transform 0.3s ease;
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%);
+        width: 260px;
+        /* Keep fixed width when sliding out */
+    }
 }
 
 .logoContainer {
@@ -55,9 +64,9 @@
 }
 
 .navItemActive {
-    background-color: #e0f2fe;
+    background-color: var(--nav-active-bg);
     /* Light blue/cyan */
-    color: var(--secondary);
+    color: var(--nav-active-text);
     border: 2px solid var(--secondary);
     border-bottom-width: 4px;
     box-shadow: none;
@@ -86,7 +95,7 @@
     border: 3px solid var(--border-color);
     border-radius: 20px;
     padding: 16px;
-    background-color: var(--white);
+    background-color: var(--bg-card);
     box-shadow: 0 4px 0 var(--border-color);
     /* Blocky shadow */
     transition: transform 0.1s;
