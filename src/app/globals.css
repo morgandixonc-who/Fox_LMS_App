@@ -41,6 +41,9 @@
 
   --card-border-width: 2px;
   --card-shadow-depth: 4px;
+
+  /* Layout */
+  --sidebar-width: 300px;
 }
 
 /* Dark Mode Overrides */
