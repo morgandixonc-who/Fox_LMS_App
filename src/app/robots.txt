@@ -1,0 +1,3 @@
+# disallows all requesting bots from scraping any website pages
+User-agent: *
+Disallow: *
