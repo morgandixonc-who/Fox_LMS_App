@@ -72,15 +72,15 @@ export const generateWorld = (cycles: number = 2): BiomeConfig[] => {
                 id: levelCounter++,
                 x: x + (Math.random() * 20 - 10), // jitter
                 y,
-                status: levelCounter === 2 ? 'active' : 'locked' // Only first level active generally
+                status: 'active' // TEMP: Unlock all for testing
             });
         }
 
         // Ensure strictly level 1 is active (override logic above slightly)
-        if (levels.length > 0 && levels[0].id === 1) {
-            levels[0].status = 'active'; // Level 1 is active
-            if (levels.length > 1) levels[1].status = 'locked';
-        }
+        // if (levels.length > 0 && levels[0].id === 1) {
+        //    levels[0].status = 'active'; // Level 1 is active
+        //    if (levels.length > 1) levels[1].status = 'locked';
+        // }
 
 
         world.push({

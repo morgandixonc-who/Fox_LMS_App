@@ -3,8 +3,10 @@
 import React, { useState } from 'react';
 import { getEmotion } from '@/lib/emotions';
 
+import { useRouter } from 'next/navigation';
+
 export default function ColorPalettePage() {
-    const [emotion, setEmotion] = useState<{ text: string; x: number; y: number; color: string } | null>(null);
+    const router = useRouter();
 
     const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
         const { clientX, clientY, currentTarget } = e;
@@ -20,16 +22,10 @@ export default function ColorPalettePage() {
         const l = 100 - (yParam * 100);
 
         const text = getEmotion(h, l);
+        const color = `hsl(${h}, 100%, 50%)`;
 
-        // Dynamic text color based on lightness
-        const textColor = l < 50 ? 'white' : 'black';
-
-        setEmotion({
-            text,
-            x: clientX,
-            y: clientY,
-            color: textColor
-        });
+        // Navigate to the Level Intro Page
+        router.push(`/level-intro?name=${encodeURIComponent(text)}&color=${encodeURIComponent(color)}&hue=${h}`);
     };
 
     return (
@@ -65,72 +61,24 @@ export default function ColorPalettePage() {
                 `,
                 backgroundBlendMode: 'normal'
             }}
-            aria-label="Interactive color emotion map. Click to reveal an emotion."
+            aria-label="Interactive color emotion map. Click to open a level."
         >
-            {emotion && (
-                <div style={{
-                    position: 'absolute',
-                    top: emotion.y,
-                    left: emotion.x,
-                    transform: 'translate(-50%, -100%) translateY(-30px)',
-                    color: emotion.color,
-                    textAlign: 'center',
-                    pointerEvents: 'none',
-                    width: '300px', // Prevent text from getting too wide
-                    animation: 'popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
-                }}>
-                    <h2 style={{
-                        fontSize: '2.5rem',
-                        fontWeight: '900',
-                        textTransform: 'uppercase',
-                        lineHeight: '1',
-                        margin: 0,
-                        textShadow: emotion.color === 'white'
-                            ? '0 2px 20px rgba(0,0,0,0.8), 0 0 5px rgba(0,0,0,1)'
-                            : '0 2px 20px rgba(255,255,255,1), 0 0 5px rgba(255,255,255,1)',
-                        letterSpacing: '-2px',
-                        fontFamily: 'sans-serif'
-                    }}>
-                        {emotion.text}
-                    </h2>
-
-                    {/* Tiny coordinate display for tech feel */}
-                    <div style={{
-                        fontSize: '0.7rem',
-                        marginTop: '5px',
-                        opacity: 0.7,
-                        fontFamily: 'monospace',
-                        letterSpacing: '1px'
-                    }}>
-                        COORD: {Math.floor(emotion.x)} : {Math.floor(emotion.y)}
-                    </div>
-
-                    <style jsx>{`
-            @keyframes popIn {
-              from { transform: translate(-50%, -100%) translateY(0px) scale(0.8); opacity: 0; }
-              to { transform: translate(-50%, -100%) translateY(-30px) scale(1); opacity: 1; }
-            }
-          `}</style>
-                </div>
-            )}
-
-            {!emotion && (
-                <div style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    color: 'rgba(0,0,0,0.5)',
-                    fontSize: '1rem',
-                    fontWeight: '700',
-                    pointerEvents: 'none',
-                    mixBlendMode: 'overlay',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.2rem'
-                }}>
-                    Select a Frequency
-                </div>
-            )}
+            {/* Simple instruction centered */}
+            <div style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                color: 'rgba(0,0,0,0.5)',
+                fontSize: '1rem',
+                fontWeight: '700',
+                pointerEvents: 'none',
+                mixBlendMode: 'overlay',
+                textTransform: 'uppercase',
+                letterSpacing: '0.2rem'
+            }}>
+                Click to Create Emotion
+            </div>
         </div>
     );
 }

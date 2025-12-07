@@ -5,94 +5,93 @@ import path from 'path';
 
 export async function POST(req: NextRequest) {
     try {
-        console.log("API: Request received");
+        console.log("API: generate-tasks request received");
         let body;
         try {
             body = await req.json();
-            console.log("API: Body parsed", body);
         } catch (e) {
-            console.error("API: Body parsing failed", e);
             return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
         }
 
-        const { emotion } = body;
+        const { emotion, descriptors } = body;
 
         if (!emotion) {
-            console.log("API: Emotion missing");
             return NextResponse.json({ error: 'Emotion is required' }, { status: 400 });
         }
 
         const apiKey = process.env.GEMINI_API_KEY;
         if (!apiKey) {
-            console.error("API: API Key missing");
             return NextResponse.json({ error: 'GEMINI_API_KEY is not configured' }, { status: 500 });
         }
 
         // Read system prompt
-        const promptPath = path.join(process.cwd(), 'src', 'lib', 'prompts', 'descriptorgenerator.txt');
-        console.log("API: Reading prompt from", promptPath);
+        const promptPath = path.join(process.cwd(), 'src', 'lib', 'prompts', 'taskgenerator.txt');
 
         let systemPrompt = "";
         try {
             systemPrompt = await fs.readFile(promptPath, 'utf-8');
-            console.log("API: Prompt read successfully (length: " + systemPrompt.length + ")");
         } catch (err) {
             console.error("API: Failed to read system prompt:", err);
             return NextResponse.json({ error: 'System prompt file missing' }, { status: 500 });
         }
 
-        console.log("API: Initializing GoogleGenAI");
+        // Initialize Gemini
         const ai = new GoogleGenAI({ apiKey });
-        // Use the model name that was proven to work in the user's test script
-        console.log("API: Using model gemini-2.0-flash-lite");
-        const model = "gemini-2.0-flash-lite";
+        const model = "gemini-flash-latest";
+
+        const userInput = `Emotion: ${emotion}\nDescriptors: ${descriptors || 'N/A'}\n\nGenerate training tasks based on this.`;
 
         const contents = [
             {
                 role: 'user',
                 parts: [
-                    { text: systemPrompt + "\n\n" + `List descriptors for: ${emotion}` }
+                    { text: systemPrompt + "\n\n" + userInput }
                 ]
             }
         ];
 
-        console.log("API: Calling generateContent");
+        console.log("API: Calling generateContent for tasks");
 
         try {
             const result = await ai.models.generateContent({
                 model,
                 contents,
             });
-            console.log("API: Call complete");
 
-            // Safer text extraction
+            // Extract text logic (same robust checks as other route)
             let text = "";
-
-            // Standard Gemini Result Structure check
             if ((result as any).response && (result as any).response.candidates && (result as any).response.candidates.length > 0) {
                 const candidate = (result as any).response.candidates[0];
                 if (candidate.content && candidate.content.parts && candidate.content.parts.length > 0) {
                     text = candidate.content.parts[0].text;
                 }
-            }
-            // Result might be the response itself (not wrapped in .response)
-            else if ((result as any).candidates && (result as any).candidates.length > 0) {
+            } else if ((result as any).candidates && (result as any).candidates.length > 0) {
                 const candidate = (result as any).candidates[0];
                 if (candidate.content && candidate.content.parts && candidate.content.parts.length > 0) {
                     text = candidate.content.parts[0].text;
                 }
-            }
-            // SDK convenience method
-            else if (typeof (result as any).text === 'function') {
+            } else if (typeof (result as any).text === 'function') {
                 text = (result as any).text();
             } else if ((result as any).response && typeof (result as any).response.text === 'function') {
                 text = (result as any).response.text();
             } else {
-                console.warn("API: Unexpected result shape", JSON.stringify(result));
                 text = JSON.stringify(result, null, 2);
             }
 
-            console.log("API: Text extracted", text.substring(0, 50) + "...");
+            // Clean Markdown Code Blocks if present (e.g., ```json ... ```)
+            text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+
+            console.log("API: Task generation complete. Length:", text.length);
+
+            // Validate JSON
+            try {
+                JSON.parse(text); // Check if valid JSON
+            } catch (jsonErr) {
+                console.warn("API: Response was not valid JSON:", text.substring(0, 100));
+                // We'll return it anyway, but the frontend might fail to parse.
+                // Or we can error out. Let's return the text but logged warning.
+            }
+
             return NextResponse.json({ result: text });
 
         } catch (genError: any) {
