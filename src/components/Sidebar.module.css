@@ -1,0 +1,133 @@
+.sidebar {
+    width: var(--sidebar-width);
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    border-right: 2px solid var(--border-color);
+    background-color: var(--white);
+    padding: 24px 16px;
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+    overflow-y: auto;
+    /* Allow scrolling if widgets take up space */
+    gap: 24px;
+}
+
+.logoContainer {
+    padding: 0 12px;
+}
+
+.nav {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.navItem {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 14px 20px;
+    border-radius: 16px;
+    color: var(--text-light);
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 0.95rem;
+    letter-spacing: 0.8px;
+    border: 2px solid transparent;
+    transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+    cursor: pointer;
+}
+
+.navItem:hover {
+    background-color: var(--surface-hover);
+    color: var(--text-color);
+    transform: translateX(4px);
+}
+
+.navItemActive {
+    background-color: rgba(0, 196, 204, 0.15);
+    color: var(--secondary);
+    border: 2px solid var(--secondary);
+    box-shadow: 0 4px 0 rgba(0, 196, 204, 0.2);
+}
+
+.navItemActive:hover {
+    background-color: rgba(0, 196, 204, 0.2);
+    transform: none;
+}
+
+.navText {
+    display: inline-block;
+    margin-top: 2px;
+}
+
+/* WIDGET STYLES */
+.widgetContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    border-top: 2px solid var(--border-color);
+    padding-top: 20px;
+}
+
+.widget {
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 16px;
+    background-color: #fff;
+}
+
+.widgetHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    font-weight: 800;
+    font-size: 1.1rem;
+}
+
+.streakRow {
+    display: flex;
+    justify-content: space-between;
+}
+
+.fireActive {
+    color: var(--primary);
+}
+
+.fireInactive {
+    color: #e5e5e5;
+}
+
+.questItem {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.questIcon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.progressBar {
+    height: 8px;
+    background-color: #e5e5e5;
+    border-radius: 4px;
+    width: 100%;
+    margin-top: 4px;
+}
+
+.progressFill {
+    height: 100%;
+    background-color: var(--success);
+    border-radius: 4px;
+}

@@ -1,0 +1,80 @@
+.mapContainer {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    /* Grassy tiling background */
+    background-color: #8bd663;
+    background-image:
+        radial-gradient(#9cdb79 15%, transparent 16%),
+        radial-gradient(#7acc54 15%, transparent 16%);
+    background-size: 30px 30px;
+    background-position: 0 0, 15px 15px;
+    border-radius: 20px;
+    padding: 40px 0;
+    box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.2), 0 10px 0 #6bad48;
+    overflow: hidden;
+    border: 4px solid #75b855;
+}
+
+.svgPath {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+    /* Path above river, below nodes */
+}
+
+.riverLayer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 5;
+    /* River below path */
+    opacity: 0.8;
+}
+
+/* Decor items */
+.decor {
+    position: absolute;
+    font-size: 2rem;
+    z-index: 1;
+    filter: drop-shadow(0 4px 2px rgba(0, 0, 0, 0.1));
+    transition: transform 0.3s ease;
+    user-select: none;
+}
+
+.decor:hover {
+    transform: scale(1.2) rotate(10deg);
+    cursor: default;
+}
+
+.forestGroup {
+    position: absolute;
+    z-index: 1;
+}
+
+/* Animations */
+@keyframes flow {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(-20px);
+    }
+}
+
+.levelContainer {
+    position: relative;
+    z-index: 20;
+    /* Nodes on top of everything */
+    height: 1400px;
+    /* Taller for more space */
+}

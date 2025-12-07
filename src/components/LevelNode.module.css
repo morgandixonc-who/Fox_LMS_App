@@ -1,0 +1,71 @@
+.nodeWrapper {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.node {
+    width: 80px;
+    height: 70px;
+    /* Slightly squashed for pseudo-3D */
+    border-radius: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    border: none;
+    z-index: 2;
+    transition: transform 0.1s, filter 0.2s;
+}
+
+/* Styles for "Stone" look */
+.locked {
+    background-color: #9ca3af;
+    box-shadow: 0 8px 0 #6b7280;
+    color: #d1d5db;
+}
+
+.active {
+    background-color: var(--primary);
+    box-shadow: 0 8px 0 var(--primary-dark);
+    color: white;
+    animation: bounce 2s infinite;
+}
+
+.completed {
+    background-color: #fbbf24;
+    /* Gold */
+    box-shadow: 0 8px 0 #d97706;
+    /* Dark Gold/Orange */
+    color: #fff;
+}
+
+.node:active {
+    transform: translateY(8px);
+    box-shadow: 0 0 0 transparent !important;
+}
+
+.node:hover {
+    filter: brightness(1.1);
+    transform: translateY(-2px);
+}
+
+.node:active {
+    transform: translateY(8px) !important;
+}
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}

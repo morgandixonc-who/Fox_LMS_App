@@ -1,0 +1,148 @@
+:root {
+  /* Fox Training App - Design Tokens */
+  --primary: #FF9600;
+  /* Fox Orange */
+  --primary-light: #ffac33;
+  --primary-dark: #cc7a00;
+  --secondary: #00C4CC;
+  /* Teal Contrast */
+  --secondary-light: #52e0e6;
+  --secondary-dark: #008f94;
+  --bg-color: #ffffff;
+  --surface-color: #fffbf2;
+  /* Warmer surface color (very light orange/cream) */
+  --surface-hover: #faeac8;
+  --text-color: #4b4b4b;
+  /* Softer black */
+  --text-light: #777777;
+  --border-color: #e5e5e5;
+  --success: #58CC02;
+  --error: #FF4B4B;
+  --white: #ffffff;
+
+  --radius: 20px;
+  /* Rounder corners */
+  --btn-height: 52px;
+  /* Slightly taller buttons */
+  --sidebar-width: 256px;
+  --header-height: 64px;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  font-family: var(--font-geist-sans), sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  overflow-x: hidden;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Animations */
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+@keyframes title-pop {
+  0% {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Custom Utilities */
+.container {
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  color: var(--text-color);
+}
+
+/* Button Styles - Duolingo/3D style */
+.btn {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  height: var(--btn-height);
+  padding: 0 32px;
+  border-radius: var(--radius);
+  font-weight: 800;
+  /* Bolder text */
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  cursor: pointer;
+  transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Snappier transition */
+  border: 2px solid transparent;
+  user-select: none;
+  font-size: 1rem;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  color: var(--white);
+  box-shadow: 0 5px 0 var(--primary-dark);
+}
+
+.btn-primary:active {
+  box-shadow: 0 0 0 var(--primary-dark);
+  transform: translateY(5px);
+}
+
+.btn-secondary {
+  background-color: var(--secondary);
+  color: var(--white);
+  box-shadow: 0 5px 0 var(--secondary-dark);
+}
+
+.btn-secondary:active {
+  box-shadow: 0 0 0 var(--secondary-dark);
+  transform: translateY(5px);
+}
+
+.btn-outline {
+  background-color: var(--white);
+  color: var(--secondary);
+  border: 2px solid var(--border-color);
+  box-shadow: 0 5px 0 var(--border-color);
+}
+
+.btn-outline:active {
+  box-shadow: 0 0 0 var(--border-color);
+  transform: translateY(5px);
+  background-color: var(--surface-color);
+}
+
+.btn:hover {
+  filter: brightness(1.05);
+  /* Slight brighten on hover */
+}
