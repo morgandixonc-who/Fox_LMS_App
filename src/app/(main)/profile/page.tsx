@@ -1,26 +1,54 @@
 'use client';
 import { useRouter } from 'next/navigation';
 
-export default function AboutPage(){
+export default function ProfilePage() {
     const router = useRouter();
 
     return (
-        <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center', backgroundColor: '#000', minHeight: '100vh' }}>
-            <header style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100, padding: '20px', pointerEvents: 'none' }}>
-                <h1 className="title" style={{
-                    color: 'white',
-                    textShadow: '0 4px 0 #000',
-                    margin: 0,
-                    display: 'inline-block',
-                    padding: '10px 20px',
-                    backgroundColor: 'rgba(0,0,127,0.5)',
-                    borderRadius: '20px',
-                    backdropFilter: 'blur(10px)'
-                }}>
-                    PROFILE
-                </h1>
-            </header>
+        <div style={{ maxWidth: '600px', margin: '0 auto', padding: '40px 20px' }}>
+            <h1 className="title">Profile</h1>
 
+            {/* Account Section */}
+            <div style={{ marginBottom: '40px' }}>
+                <h2 style={{ marginBottom: '20px' }}>Account</h2>
+                <div style={{
+                    padding: '20px',
+                    border: '2px solid var(--border-color)',
+                    borderRadius: 'var(--radius)',
+                    marginBottom: '20px'
+                }}>
+                    <div style={{ marginBottom: '10px' }}>
+                        <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '4px' }}>Username</label>
+                        <input
+                            defaultValue="DrFox"
+                            style={{ width: '100%', padding: '8px', borderRadius: '8px', border: '1px solid #ccc' }}
+                        />
+                    </div>
+                    <div>
+                        <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '4px' }}>Email</label>
+                        <input
+                            defaultValue="fox@example.com"
+                            style={{ width: '100%', padding: '8px', borderRadius: '8px', border: '1px solid #ccc' }}
+                        />
+                    </div>
+                </div>
+            </div>
+
+            {/* Subscription Section */}
+            <div>
+                <h2 style={{ marginBottom: '20px' }}>Subscription</h2>
+                <div style={{
+                    padding: '30px',
+                    backgroundColor: '#fffbe6', /* Light yellow/gold */
+                    border: '2px solid var(--primary)',
+                    borderRadius: 'var(--radius)',
+                    textAlign: 'center'
+                }}>
+                    <h3 style={{ fontSize: '1.5rem', marginBottom: '10px', color: 'var(--primary-dark)' }}>Fox Training Pro</h3>
+                    <p style={{ marginBottom: '20px' }}>Unlock unlimited practice scenarios and advanced AI personas.</p>
+                    <button className="btn btn-primary" style={{ width: '100%' }}>Upgrade to Pro</button>
+                </div>
+            </div>
         </div>
     );
 

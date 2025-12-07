@@ -4,10 +4,12 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Home, Dumbbell, User, Settings, LogOut, Shield, Flame, Zap, Trophy } from 'lucide-react';
+import { useDarkMode } from '@/contexts/DarkModeContext';
 import styles from './Sidebar.module.css';
 
 export default function Sidebar() {
     const pathname = usePathname();
+    const { darkMode } = useDarkMode();
 
     const isActive = (path: string) => pathname?.startsWith(path);
 
@@ -15,11 +17,11 @@ export default function Sidebar() {
         <aside className={styles.sidebar}>
             <div className={styles.logoContainer}>
                 <Image
-                    src="/assets/logoflat.png"
+                    src={darkMode ? "/assets/logoflat-light.png" : "/assets/logoflat.png"}
                     alt="Fox Training"
-                    width={150}
-                    height={40}
-                    style={{ objectFit: 'contain', width: 'auto', height: '40px' }}
+                    width={200}
+                    height={60}
+                    style={{ objectFit: 'contain', width: 'auto', height: '60px' }}
                     priority
                 />
             </div>
@@ -55,7 +57,7 @@ export default function Sidebar() {
                         </span>
                     </div>
                     {/* Simplified Streak Row for Sidebar */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', fontWeight: 'bold', color: '#ccc' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', fontWeight: 'bold', color: 'var(--text-light)' }}>
                         <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
                     </div>
                 </div>

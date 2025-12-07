@@ -28,6 +28,22 @@
   --header-height: 64px;
 }
 
+/* Dark Mode */
+.dark-mode {
+  --bg-color: #0f0f0f;
+  --surface-color: #1a1a1a;
+  --surface-hover: #252525;
+  --text-color: #e5e5e5;
+  --text-light: #a0a0a0;
+  --border-color: #333333;
+  --white: #ffffff;
+}
+
+.dark-mode body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
 * {
   box-sizing: border-box;
   padding: 0;
