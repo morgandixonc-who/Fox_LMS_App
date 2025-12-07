@@ -30,9 +30,7 @@ export default function DashboardPage() {
         <div style={{
             // Padding left handled by layout via sidebar-width
             textAlign: 'center',
-            backgroundColor: '#f0fdf4',
-            backgroundImage: `radial-gradient(#00a896 1px, transparent 1px)`,
-            backgroundSize: '30px 30px',
+            backgroundColor: '#fff',
             minHeight: '100vh',
             position: 'relative',
         }}>
@@ -64,22 +62,16 @@ export default function DashboardPage() {
                 }}>
                     <span>🗺️</span> My Journey
                 </h1>
-            </header>
+            </header >
 
-            {/* Voxel Decorations (Floating Clouds) */}
-            <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0, pointerEvents: 'none' }}>
-                <div style={{ position: 'absolute', top: '10%', left: '10%', animation: 'float 12s ease-in-out infinite' }}>
-                    <VoxelScene><VoxelCloud /></VoxelScene>
-                </div>
-                <div style={{ position: 'absolute', top: '20%', right: '15%', animation: 'float 15s ease-in-out infinite reverse' }}>
-                    <VoxelScene><VoxelCloud /></VoxelScene>
-                </div>
-                <div style={{ position: 'absolute', bottom: '10%', left: '25%', opacity: 0.8, transform: 'scale(0.8)', animation: 'float 20s ease-in-out infinite' }}>
-                    <VoxelScene><VoxelCloud /></VoxelScene>
-                </div>
-            </div>
-
-            <div style={{ paddingBottom: '100px', paddingTop: '100px', position: 'relative', zIndex: 1 }}>
+            <div style={{
+                paddingBottom: '100px',
+                paddingTop: '100px',
+                position: 'relative',
+                zIndex: 1,
+                maxWidth: '640px',
+                margin: '0 auto',
+            }}>
                 {world.map((biome, index) => (
                     <BiomeSection
                         key={index}
@@ -88,6 +80,6 @@ export default function DashboardPage() {
                     />
                 ))}
             </div>
-        </div>
+        </div >
     );
 }

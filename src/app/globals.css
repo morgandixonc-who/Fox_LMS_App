@@ -42,7 +42,8 @@
   --card-border-width: 2px;
   --card-shadow-depth: 4px;
 
-  --sidebar-width: 260px;
+  /* Layout */
+  --sidebar-width: 300px;
 
   /* Semantic UI Colors */
   --bg-sidebar: var(--white);

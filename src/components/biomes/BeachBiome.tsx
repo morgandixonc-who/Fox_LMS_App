@@ -4,10 +4,14 @@ import { useEffect, useState, useMemo } from 'react';
 
 // --- Voxel Constants ---
 const GRID_SIZE = 40; // Large grid for chunky look
-const WORLD_WIDTH_UNITS = 40; // INCREASED to cover wider screens
+const WORLD_WIDTH_UNITS = 40; // Wide world to fill screen
 // The physical height of the 3D block face. Sand is "taller" than water.
 const BLOCK_HEIGHT_SAND = 12;
 const BLOCK_HEIGHT_WATER = 6;
+
+// --- Path Generation Constants (Must match biomes.ts roughly) ---
+const LEVEL_SPACING_PX = 120;
+const TOP_PADDING = 100;
 
 // --- Palette (Flat, vibrant Crossy Road colors) ---
 const COLORS = {
@@ -97,17 +101,48 @@ export default function BeachBiomeSmooth({ height }: { height: number }) {
     // 2. Generate Props placed on the grid blocks
     const props = useMemo(() => {
         const items: Prop[] = [];
+
+        // Helper to check path collision
+        const isNearPath = (col: number, row: number) => {
+            const yPx = row * GRID_SIZE;
+            // Estimated Level Index at this height (inverse of biomes.ts logic)
+            // yPx = TOP_PADDING + (i * LEVEL_SPACING_PX)
+            // i = (yPx - TOP_PADDING) / LEVEL_SPACING_PX
+
+            const i = (yPx - TOP_PADDING) / LEVEL_SPACING_PX;
+            if (i < 0) return false; // Above path start
+
+            // Path X percent calculation from biomes.ts
+            // const xOffset = Math.sin(i * waveFreq) * amplitude;
+            // waveFreq = 0.5, amplitude = 20
+            const waveFreq = 0.5;
+            const amplitude = 25;
+            const xOffset = Math.sin(i * waveFreq) * amplitude;
+            const xPercent = 50 + xOffset; // 0-100
+
+            // Convert Percent to Column index
+            const pathCol = (xPercent / 100) * WORLD_WIDTH_UNITS;
+
+            // Check distance
+            // If within 3 blocks, it's too close to the path
+            return Math.abs(col - pathCol) < 6;
+        };
+
         gridBlocks.forEach((block, i) => {
             // Skip rows too close to bottom edge or top edge
             if (block.row > rowCount - 3 || block.row < 2) return;
 
+            // PATH AVOIDANCE CHECK
+            if (isNearPath(block.col, block.row)) return;
+
             const rand = Math.random();
 
-            if (block.type === 'sand' && rand > 0.94) {
+            if (block.type === 'sand' && rand > 0.85) {
+                // Lower probability slightly due to wider world
                 items.push({ id: `p-${i}`, col: block.col, row: block.row, type: rand > 0.97 ? 'rock' : 'starfish', rotation: Math.floor(Math.random() * 4) * 90 });
             }
             // Driftwood only in shallow water near the sand edge
-            if (block.type === 'water_shallow' && block.showEdge && rand > 0.85) {
+            if (block.type === 'water_shallow' && block.showEdge && rand > 0.75) {
                 items.push({ id: `p-${i}`, col: block.col, row: block.row, type: 'driftwood', rotation: rand > 0.5 ? 0 : 90 });
             }
         });
@@ -126,12 +161,10 @@ export default function BeachBiomeSmooth({ height }: { height: number }) {
             style={{
                 height,
                 width: '100%',
-                // Removed maxWidth to allow filling
                 position: 'relative',
                 backgroundColor: COLORS.WATER_DEEP_TOP, // Base background
                 overflow: 'hidden',
                 borderRadius: '16px', // Softer corners
-                // No border here anymore
             }}
         >
             {/* --- LAYER 1 & 2: TERRAIN BLOCKS --- */}

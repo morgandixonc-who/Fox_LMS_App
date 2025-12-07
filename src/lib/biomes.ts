@@ -35,57 +35,68 @@ export const generateWorld = (cycles: number = 2): BiomeConfig[] => {
 
     let world: BiomeConfig[] = [];
     let levelCounter = 1;
-    const TOTAL_LEVELS_MODULE_1 = 30;
-    const TOTAL_LEVELS_OTHERS = 365;
 
-    // We only process 1 cycle effectively for the specific level count request, 
-    // but code structure allows loops.
-    // Assuming 1 cycle covers the "Journey".
+    // Config for path generation
+    // Config for path generation
+    const LEVEL_SPACING_PX = 120; // Space between levels vertically
+    const TOP_PADDING = 100;
+    const BOTTOM_PADDING = 100;
+
+    const TOTAL_LEVELS_MODULE_1 = 30; // Beach
 
     sequence.forEach((type, index) => {
         const levels: Level[] = [];
         let levelsThisBiome = 0;
 
         if (index === 0) {
-            // Module 1 (Beach): 30 Levels
             levelsThisBiome = TOTAL_LEVELS_MODULE_1;
         } else {
-            // Modules 2-13 (12 biomes): 365 Levels total
-            // 365 / 12 = 30.41...
-            // Some get 30, some get 31.
-            // 30 * 12 = 360. need 5 more.
-            // Biomes 1-5 get 31, 6-12 get 30.
-            if (index <= 5) { // indices 1,2,3,4,5
-                levelsThisBiome = 31;
-            } else {
-                levelsThisBiome = 30;
-            }
+            // Distribute remaining 365 levels
+            if (index <= 5) levelsThisBiome = 31;
+            else levelsThisBiome = 30;
         }
 
+        // Calculate dynamic height for this biome
+        // Ensure enough space for all levels + padding
+        const neededHeight = (levelsThisBiome * LEVEL_SPACING_PX) + TOP_PADDING + BOTTOM_PADDING;
+
+        // Sine wave path parameters
+        // We want the path to wind back and forth. 
+        // A full sine wave cycle is 2*PI. 
+        // We probably want the path to switch sides every 5-7 levels?
+        const waveFreq = 0.5; // Controls how tight the turns are
+        const amplitude = 25; // Percentage from center (center is 50%, so swings 25% to 75%)
+
         for (let i = 0; i < levelsThisBiome; i++) {
-            // Simple zigzag pattern for variety
-            const x = (i % 2 === 0) ? 30 : 70;
-            // Distribute vertically 
-            const y = 10 + (i / levelsThisBiome) * 80;
+            // Y Position:
+            // Calculated as pixel offsets then converted to percentage relative to neededHeight for the layout system
+            // But LevelNode usually takes Y as 'px' if we change the BiomeSection to run that way, 
+            // OR we stick to % layout. The current BiomeSection passes `config.height * (level.y / 100)`.
+            // So we just need to calculate the % that corresponds to the specific pixel placement.
+
+            const yPx = TOP_PADDING + (i * LEVEL_SPACING_PX);
+            const yPercent = (yPx / neededHeight) * 100;
+
+            // X Position: Sine wave
+            // Sin(i) gives -1 to 1.
+            const xOffset = Math.sin(i * waveFreq) * amplitude;
+
+            // Add slight randomness to 'x' so it's not a perfect robot path
+            // But keep it bounded so nodes don't fall off screen
+            const randomJitter = 0;
+            const x = 50 + xOffset + randomJitter;
 
             levels.push({
                 id: levelCounter++,
-                x: x + (Math.random() * 20 - 10), // jitter
-                y,
-                status: 'active' // TEMP: Unlock all for testing
+                x: Math.max(10, Math.min(90, x)), // Clamp between 10% and 90%
+                y: yPercent,
+                status: 'active'
             });
         }
 
-        // Ensure strictly level 1 is active (override logic above slightly)
-        // if (levels.length > 0 && levels[0].id === 1) {
-        //    levels[0].status = 'active'; // Level 1 is active
-        //    if (levels.length > 1) levels[1].status = 'locked';
-        // }
-
-
         world.push({
             type,
-            height: 1000,
+            height: neededHeight,
             cssClass: type,
             levels
         });
