@@ -1,0 +1,141 @@
+/* Voxel Scene */
+.scene {
+    perspective: 600px;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+}
+
+/* Voxel Cube (1em x 1em x 1em) */
+.cube {
+    width: 1em;
+    height: 1em;
+    position: absolute;
+    transform-style: preserve-3d;
+    /* Default isometric-ish rotation for the object itself, or handled by parent */
+}
+
+.face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    /* Detailed edge */
+    /* Backface visibility can be hidden if optimization needed, but visible is better for glass/transparency */
+}
+
+/* Face Transforms */
+.front {
+    transform: rotateY(0deg) translateZ(0.5em);
+}
+
+.back {
+    transform: rotateY(180deg) translateZ(0.5em);
+}
+
+.right {
+    transform: rotateY(90deg) translateZ(0.5em);
+}
+
+.left {
+    transform: rotateY(-90deg) translateZ(0.5em);
+}
+
+.top {
+    transform: rotateX(90deg) translateZ(0.5em);
+}
+
+.bottom {
+    transform: rotateX(-90deg) translateZ(0.5em);
+}
+
+/* Color Shading (simulated lighting) */
+.top {
+    filter: brightness(1.1);
+}
+
+.front {
+    filter: brightness(1.0);
+}
+
+.right {
+    filter: brightness(0.8);
+}
+
+.left {
+    filter: brightness(0.9);
+}
+
+.bottom {
+    filter: brightness(0.6);
+}
+
+.back {
+    filter: brightness(0.7);
+}
+
+/* Animations */
+@keyframes spin {
+    from {
+        transform: rotateY(0deg) rotateX(10deg);
+    }
+
+    to {
+        transform: rotateY(360deg) rotateX(10deg);
+    }
+}
+
+@keyframes floatSlow {
+    0% {
+        transform: translateY(0px) rotateY(-10deg);
+    }
+
+    50% {
+        transform: translateY(-20px) rotateY(10deg);
+    }
+
+    100% {
+        transform: translateY(0px) rotateY(-10deg);
+    }
+}
+
+@keyframes floatBob {
+    0% {
+        transform: translateY(0px);
+    }
+
+    100% {
+        transform: translateY(-10px);
+    }
+}
+
+/* Specific Materials */
+.whiteCube .face {
+    background-color: #ffffff;
+}
+
+.cloudBase .face {
+    background-color: #f0fdf4;
+    border: none;
+}
+
+/* Softer cloud */
+
+.redCube .face {
+    background-color: #FF4B4B;
+}
+
+.pinkCube .face {
+    background-color: #FF86D0;
+}
+
+.greenCube .face {
+    background-color: #58CC02;
+}
+
+.greenDarkCube .face {
+    background-color: #46a302;
+}
+
+/* Grid positioning helpers can be done in JS inline styles */

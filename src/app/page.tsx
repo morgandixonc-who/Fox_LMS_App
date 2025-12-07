@@ -2,6 +2,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { MessageSquare, Shield, TrendingUp, ChevronRight } from 'lucide-react';
 import styles from './Home.module.css';
+import { VoxelScene } from '@/components/voxels/VoxelPrimitives';
+import { VoxelCloud, VoxelCross, VoxelHeart } from '@/components/voxels/VoxelShapes';
 
 export default function Home() {
   return (
@@ -11,10 +13,9 @@ export default function Home() {
         position: 'fixed',
         top: 0,
         width: '100%',
-        backgroundColor: 'rgba(255, 255, 255, 0.9)',
-        backdropFilter: 'blur(10px)',
+        backgroundColor: 'rgba(255, 255, 255, 0.95)',
         zIndex: 100,
-        borderBottom: '2px solid rgba(0,0,0,0.05)'
+        borderBottom: '4px solid rgba(0,0,0,0.05)'
       }}>
         <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: '1200px', margin: '0 auto', padding: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -35,32 +36,70 @@ export default function Home() {
         </div>
       </header>
 
-      <main style={{ marginTop: '80px' }}>
+      <main style={{ marginTop: '0px' }}> {/* Removed top margin as Hero handles spacing */}
         <section className={styles.hero}>
-          <div className={styles.blob1}></div>
-          <div className={styles.blob2}></div>
+          <div className={`${styles.speechBubble} ${styles.bubble1}`}>
+            How are you feeling today?
+          </div>
+          <div className={`${styles.speechBubble} ${styles.bubble2}`}>
+            I'm here to listen.
+          </div>
+
+          {/* Real Voxel Decorations using CSS 3D */}
+          <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0, pointerEvents: 'none', overflow: 'hidden' }}>
+            {/* Left Cloud */}
+            <div style={{ position: 'absolute', top: '20%', left: '5%', animation: 'float 8s ease-in-out infinite' }}>
+              <VoxelScene>
+                <VoxelCloud />
+              </VoxelScene>
+            </div>
+            {/* Right Cloud */}
+            <div style={{ position: 'absolute', top: '15%', right: '10%', animation: 'float 10s ease-in-out infinite reverse' }}>
+              <VoxelScene>
+                <VoxelCloud />
+              </VoxelScene>
+            </div>
+
+            {/* Floating Heart */}
+            <div style={{ position: 'absolute', top: '40%', right: '20%', animation: 'float 6s ease-in-out infinite' }}>
+              <VoxelScene>
+                <div style={{ animation: 'spin 10s linear infinite' }}>
+                  <VoxelHeart />
+                </div>
+              </VoxelScene>
+            </div>
+
+            {/* Floating Cross */}
+            <div style={{ position: 'absolute', top: '30%', left: '15%', animation: 'float 7s ease-in-out infinite' }}>
+              <VoxelScene>
+                <div style={{ animation: 'spin 12s linear infinite reverse' }}>
+                  <VoxelCross />
+                </div>
+              </VoxelScene>
+            </div>
+          </div>
 
           <div className={styles.logoWrapper}>
             <Image
-              src="/assets/logovertical.png"
-              alt="Fox Training Logo"
-              width={280}
-              height={280}
+              src="/assets/voxel_therapy.png"
+              alt="Voxel Therapy Scene"
+              width={500}
+              height={500}
               style={{ objectFit: 'contain' }}
               priority
             />
           </div>
           <h1 className={styles.heroTitle}>
-            Training that <span style={{ color: 'var(--primary)' }}>saves lives</span>.
+            Training that <span style={{ color: '#00a896' }}>saves lives</span>.
           </h1>
           <p className={styles.heroSubtitle}>
-            Gamified, AI-powered roleplay simulations for modern suicide prevention training. Build confidence in a safe space.
+            Practice conversations in a safe, judgment-free voxel world.
           </p>
           <div className={styles.ctaContainer}>
-            <Link href="/dashboard" className="btn btn-primary" style={{ minWidth: '200px', fontSize: '1.1rem' }}>
+            <Link href="/dashboard" className="btn btn-primary" style={{ minWidth: '220px', fontSize: '1.2rem', height: '60px' }}>
               Start for Free
             </Link>
-            <Link href="/about" className="btn btn-outline" style={{ minWidth: '200px', fontSize: '1.1rem' }}>
+            <Link href="/about" className="btn btn-outline" style={{ minWidth: '220px', fontSize: '1.2rem', height: '60px', color: 'var(--text-color)' }}>
               Learn More
             </Link>
           </div>

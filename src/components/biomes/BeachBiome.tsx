@@ -1,196 +1,243 @@
 'use client';
 
-import styles from '@/styles/biomes.module.css';
 import { useEffect, useState, useMemo } from 'react';
 
-// --- Configuration & Types ---
+// --- Voxel Constants ---
+const GRID_SIZE = 40; // Large grid for chunky look
+const WORLD_WIDTH_UNITS = 40; // INCREASED to cover wider screens
+// The physical height of the 3D block face. Sand is "taller" than water.
+const BLOCK_HEIGHT_SAND = 12;
+const BLOCK_HEIGHT_WATER = 6;
+
+// --- Palette (Flat, vibrant Crossy Road colors) ---
+const COLORS = {
+    SAND_TOP: '#fde68a',
+    SAND_SIDE: '#d6b962',
+    // Using slightly different blues for shallow vs deep to add texture without lines
+    WATER_SHALLOW_TOP: '#60a5fa',
+    WATER_SHALLOW_SIDE: '#3b82f6',
+    WATER_DEEP_TOP: '#3b82f6',
+    // Foam/Waves
+    FOAM: '#ffffff',
+    // Props
+    ROCK_TOP: '#9ca3af', ROCK_SIDE: '#6b7280',
+    WOOD_TOP: '#92400e', WOOD_SIDE: '#78350f',
+    STAR_TOP: '#fb923c', STAR_SIDE: '#c2410c',
+    SHADOW: 'rgba(0,0,0,0.15)'
+};
+
+// Types used for generating the map
+type BlockType = 'sand' | 'water_shallow' | 'water_deep';
+
+interface GridBlock {
+    col: number;
+    row: number;
+    type: BlockType;
+    // Does this block need to show its front face? (Is the block below it lower?)
+    showEdge: boolean;
+}
+
 interface Prop {
-    x: number;
-    y: number;
-    type: 'rock' | 'shell';
-    variant: number;
-    scale: number;
+    id: string;
+    col: number;
+    row: number;
+    type: 'rock' | 'driftwood' | 'starfish';
     rotation?: number;
 }
 
-interface SandSpeck {
-    x: number;
-    y: number;
-}
-
-// --- Constants ---
-const WORLD_WIDTH = 200; // Same longer width as GrassBiome
-const WORLD_HEIGHT = 250;
-const SHORE_BUFFER = 5; // Distance props must keep from the exact water line
-
-// Colors (Matte/Flat style)
-const C_SAND = '#fde68a'; // Amber-200
-const C_WATER = '#93c5fd'; // Blue-300
-const C_BORDR = '#f59e0b'; // Amber-500
-
-// Helper: Seeded random-ish generator
-const randomRange = (min: number, max: number) => Math.random() * (max - min) + min;
-
-export default function BeachBiome({ height }: { height: number }) {
+export default function BeachBiomeSmooth({ height }: { height: number }) {
     const [isMounted, setIsMounted] = useState(false);
+    const rowCount = Math.ceil(height / GRID_SIZE) + 2; // Add buffer rows at bottom
 
-    // 1. Define Shoreline Function (Sine Wave mixture)
-    // This defines the Y coordinate of the water's edge at any given X
-    const getShoreY = (x: number) => {
-        // The shore is lower down (around y=65) with gentle waves
-        return 65 + 5 * Math.sin(x / 25) + 3 * Math.cos(x / 15);
-    };
+    // 1. Generate the Terrain Map (Grid of Blocks)
+    const gridBlocks = useMemo(() => {
+        const blocks: GridBlock[] = [];
+        const gridMap = new Map<string, BlockType>(); // Helper for lookups
 
-    // 2. Generate the SVG Path string for the Water (A filled polygon below the shore line)
-    const waterPath = useMemo(() => {
-        // Start at bottom left corner
-        let d = `M 0,${WORLD_HEIGHT}`;
-        // Line up to the start of the shore
-        d += ` L 0,${getShoreY(0)}`;
-        // Iterate across the width to build the wave
-        for (let x = 5; x <= WORLD_WIDTH; x += 5) {
-            d += ` L ${x},${getShoreY(x)}`;
+        // Generate base types based on row index (the banding)
+        for (let row = 0; row < rowCount; row++) {
+            for (let col = 0; col < WORLD_WIDTH_UNITS; col++) {
+                let type: BlockType = 'sand';
+
+                // Calculate the wavy coastline curve
+                // Using sin/cos to create a natural bay shape
+                // Adjust frequency based on col/2 to stretch it out for wider world
+                const noise = Math.sin(col * 0.2) * 2 + Math.cos(col * 0.1) * 1.5;
+                const waterLine = rowCount * 0.45 + noise;
+                const deepWaterLine = rowCount * 0.7 + noise;
+
+                if (row > deepWaterLine) type = 'water_deep';
+                else if (row > waterLine) type = 'water_shallow';
+
+                gridMap.set(`${col},${row}`, type);
+            }
         }
-        // Line down to bottom right corner
-        d += ` L ${WORLD_WIDTH},${WORLD_HEIGHT}`;
-        // Close shape back to bottom left
-        d += ` Z`;
-        return d;
-    }, []);
 
-    // 3. Generate Environment Props (Rocks & Shells) with Collision Detection
-    const props: Prop[] = useMemo(() => {
+        // Second pass: define edges based on neighbors
+        for (let row = 0; row < rowCount; row++) {
+            for (let col = 0; col < WORLD_WIDTH_UNITS; col++) {
+                const currentType = gridMap.get(`${col},${row}`);
+                const typeBelow = gridMap.get(`${col},${row + 1}`);
+
+                if (!currentType) continue;
+
+                // Key Logic: Show edge ONLY if the block below is different and "lower"
+                // Sand sits above Water. Shallow Water sits above Deep Water.
+                let showEdge = false;
+                if (currentType === 'sand' && typeBelow?.includes('water')) showEdge = true;
+                if (currentType === 'water_shallow' && typeBelow === 'water_deep') showEdge = true;
+
+                blocks.push({ col, row, type: currentType, showEdge });
+            }
+        }
+        return blocks;
+    }, [rowCount]);
+
+
+    // 2. Generate Props placed on the grid blocks
+    const props = useMemo(() => {
         const items: Prop[] = [];
-        const count = 100;
+        gridBlocks.forEach((block, i) => {
+            // Skip rows too close to bottom edge or top edge
+            if (block.row > rowCount - 3 || block.row < 2) return;
 
-        let attempts = 0;
-        while (items.length < count && attempts < 500) {
-            attempts++;
+            const rand = Math.random();
 
-            let x = randomRange(5, WORLD_WIDTH - 5);
-            // Generate Y randomly across the whole height initially
-            let y = randomRange(5, WORLD_HEIGHT - 5);
-
-            // --- COLLISION CHECK ---
-            const shoreYAtPoint = getShoreY(x);
-
-            // If the prop's Y is "below" the shore line (plus buffer), it's in the water.
-            // In SVG coords, higher Y value means lower on screen.
-            if (y > shoreYAtPoint - SHORE_BUFFER) {
-                continue; // Skip, it's in the water
+            if (block.type === 'sand' && rand > 0.94) {
+                items.push({ id: `p-${i}`, col: block.col, row: block.row, type: rand > 0.97 ? 'rock' : 'starfish', rotation: Math.floor(Math.random() * 4) * 90 });
             }
-
-            const type: Prop['type'] = Math.random() > 0.7 ? 'rock' : 'shell';
-
-            items.push({
-                x,
-                y,
-                type,
-                variant: Math.floor(Math.random() * 3),
-                scale: type === 'rock' ? randomRange(0.8, 1.2) : randomRange(0.4, 0.7),
-                rotation: type === 'shell' ? randomRange(0, 360) : 0
-            });
-        }
-        // Sort by Y for depth
-        return items.sort((a, b) => a.y - b.y);
-    }, []);
-
-    // 4. Generate minimal sand texture (tiny specks)
-    const sandSpecks: SandSpeck[] = useMemo(() => {
-        const specks: SandSpeck[] = [];
-        for (let i = 0; i < 120; i++) {
-            const x = randomRange(2, WORLD_WIDTH - 2);
-            const y = randomRange(2, WORLD_HEIGHT - 2);
-
-            // Only place specks on the sand
-            if (y < getShoreY(x)) {
-                specks.push({ x, y });
+            // Driftwood only in shallow water near the sand edge
+            if (block.type === 'water_shallow' && block.showEdge && rand > 0.85) {
+                items.push({ id: `p-${i}`, col: block.col, row: block.row, type: 'driftwood', rotation: rand > 0.5 ? 0 : 90 });
             }
-        }
-        return specks;
-    }, []);
+        });
+        // Sort by row to ensure correct overlap (painter's algorithm)
+        return items.sort((a, b) => a.row - b.row);
+    }, [gridBlocks, rowCount]);
 
-    useEffect(() => {
-        setIsMounted(true);
-    }, []);
 
-    if (!isMounted) return <div style={{ height, background: C_SAND }} />;
+    useEffect(() => { setIsMounted(true); }, []);
+    if (!isMounted) return <div style={{ height, background: COLORS.SAND_TOP }} />;
+
+    const totalWidth = WORLD_WIDTH_UNITS * GRID_SIZE;
 
     return (
         <div
-            className={`${styles.biomeBase} ${styles.beach}`}
             style={{
                 height,
+                width: '100%',
+                // Removed maxWidth to allow filling
                 position: 'relative',
-                backgroundColor: C_SAND,
+                backgroundColor: COLORS.WATER_DEEP_TOP, // Base background
                 overflow: 'hidden',
-                borderRadius: '12px',
-                border: `4px solid ${C_BORDR}`,
+                borderRadius: '16px', // Softer corners
+                // No border here anymore
             }}
         >
+            {/* --- LAYER 1 & 2: TERRAIN BLOCKS --- */}
+            {/* We render this as HTML divs because they handle the interlocking easier than one giant SVG */}
+            <div style={{ position: 'relative', width: '100%', minWidth: totalWidth, height: height }}>
+                {gridBlocks.map((block) => {
+                    // Skip blocks that are way off screen at bottom
+                    if (block.row * GRID_SIZE > height) return null;
+
+                    const x = block.col * GRID_SIZE;
+                    const y = block.row * GRID_SIZE;
+                    const isSand = block.type === 'sand';
+                    const blockDepth = isSand ? BLOCK_HEIGHT_SAND : BLOCK_HEIGHT_WATER;
+
+                    const colorTop = block.type === 'sand' ? COLORS.SAND_TOP :
+                        block.type === 'water_shallow' ? COLORS.WATER_SHALLOW_TOP : COLORS.WATER_DEEP_TOP;
+
+                    const colorSide = block.type === 'sand' ? COLORS.SAND_SIDE : COLORS.WATER_SHALLOW_SIDE;
+
+                    return (
+                        <div key={`blk-${block.col}-${block.row}`} style={{ position: 'absolute', top: y, left: x, width: GRID_SIZE, height: GRID_SIZE }}>
+
+                            {/* CONDITIONAL SIDE FACE (The "Depth" without lines) */}
+                            {/* Only rendered at the transition boundary */}
+                            {block.showEdge && (
+                                <div style={{
+                                    position: 'absolute',
+                                    top: GRID_SIZE - blockDepth, // Positioned at bottom of tile
+                                    left: 0, width: GRID_SIZE,
+                                    height: blockDepth + 4, // Extend down slightly to cover gaps
+                                    backgroundColor: colorSide,
+                                    zIndex: 1 // Ensure side is below the top face
+                                }} />
+                            )}
+
+                            {/* TOP FACE (Seamless Floor) */}
+                            <div style={{
+                                position: 'absolute',
+                                top: 0, left: 0, width: GRID_SIZE,
+                                // If it shows an edge, the top face is shorter to reveal the side
+                                height: block.showEdge ? GRID_SIZE - blockDepth : GRID_SIZE,
+                                backgroundColor: colorTop,
+                                zIndex: 2 // Top face sits above side face
+                            }}>
+                                {/* Subtle Foam detail on water edge blocks */}
+                                {!isSand && block.showEdge && Math.random() > 0.5 && (
+                                    <div style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: 4, background: COLORS.FOAM, opacity: 0.4 }} />
+                                )}
+                            </div>
+                        </div>
+                    )
+                })}
+            </div>
+
+            {/* --- LAYER 3: VOXEL PROPS (SVG for crisp shapes) --- */}
             <svg
-                style={{ width: '100%', height: '100%' }}
-                // ViewBox matches the longer world width
-                viewBox={`0 0 ${WORLD_WIDTH} ${WORLD_HEIGHT}`}
+                style={{ position: 'absolute', top: 0, left: 0, width: '100%', minWidth: totalWidth, height: height, pointerEvents: 'none', zIndex: 10 }}
+                viewBox={`0 0 ${totalWidth} ${height}`}
                 preserveAspectRatio="none"
             >
-                {/* --- Layer 1: Solid Sand Background --- */}
-                <rect width="100%" height="100%" fill={C_SAND} />
+                {props.map((p) => {
+                    // Center props in their grid cell
+                    const x = p.col * GRID_SIZE + (GRID_SIZE / 2);
+                    // Offset Y slightly so they sit "on" the block, not inside it
+                    const yOffset = p.type === 'driftwood' ? BLOCK_HEIGHT_WATER : BLOCK_HEIGHT_SAND;
+                    const y = p.row * GRID_SIZE + (GRID_SIZE / 2) - yOffset + 4;
 
-                {/* --- Layer 2: Minimal Sand Texture --- */}
-                {sandSpecks.map((s, i) => (
-                    <circle
-                        key={`speck-${i}`}
-                        cx={s.x} cy={s.y} r="0.4"
-                        fill="#d97706" // Darker amber for contrast
-                        opacity="0.3"
-                    />
-                ))}
+                    return (
+                        <g key={p.id} transform={`translate(${x}, ${y})`}>
+                            {/* --- ROCK Voxel --- */}
+                            {p.type === 'rock' && (
+                                <g>
+                                    <rect x="-9" y="4" width="18" height="12" rx="4" fill={COLORS.SHADOW} />
+                                    <rect x="-9" y="-4" width="18" height="14" rx="4" fill={COLORS.ROCK_SIDE} />
+                                    <rect x="-9" y="-10" width="18" height="14" rx="4" fill={COLORS.ROCK_TOP} />
+                                </g>
+                            )}
 
-                {/* --- Layer 3: The Ocean (Filled area below shore) --- */}
-                <path
-                    d={waterPath}
-                    fill={C_WATER}
-                    stroke="none"
-                />
-                {/* Optional: A subtle foam line at the edge */}
-                <path
-                    d={waterPath.split(' L ' + WORLD_WIDTH)[0].substring(WORLD_HEIGHT.toString().length + 4)} // Extract just the top curve part of the path roughly
-                    fill="none"
-                    stroke="#bfdbfe" // Lighter blue
-                    strokeWidth="2"
-                    opacity="0.5"
-                />
+                            {/* --- STARFISH Voxel --- */}
+                            {p.type === 'starfish' && (
+                                <g transform={`rotate(${p.rotation || 0}) scale(0.8)`}>
+                                    <rect x="-3" y="-8" width="6" height="16" rx="2" fill={COLORS.STAR_SIDE} />
+                                    <rect x="-3" y="-11" width="6" height="16" rx="2" fill={COLORS.STAR_TOP} />
+                                    <rect x="-3" y="-8" width="6" height="16" rx="2" fill={COLORS.STAR_SIDE} transform="rotate(90)" />
+                                    <rect x="-3" y="-11" width="6" height="16" rx="2" fill={COLORS.STAR_TOP} transform="rotate(90)" />
+                                </g>
+                            )}
 
-                {/* --- Layer 4: Props on Sand --- */}
-                {props.map((prop, i) => (
-                    <g key={`prop-${i}`} transform={`translate(${prop.x}, ${prop.y}) scale(${prop.scale}) rotate(${prop.rotation || 0})`}>
-
-                        {/* ROCK (Reused style from GrassBiome for consistency) */}
-                        {prop.type === 'rock' && (
-                            <g>
-                                <path d="M-2,0 L-1,-1.5 L1,-2 L2,0 Z" fill="#a8a29e" /> {/* Warmer grey */}
-                                <path d="M-2,0 L2,0 L0,1 Z" fill="#78716c" opacity="0.3" />
-                            </g>
-                        )}
-
-                        {/* SHELL (Simple colorful circles/ovals) */}
-                        {prop.type === 'shell' && (
-                            <g>
-                                {/* Small shadow */}
-                                <ellipse cx="0" cy="0.5" rx="1.2" ry="0.8" fill="#d97706" opacity="0.2" />
-                                {/* Shell body */}
-                                <ellipse
-                                    cx="0" cy="0" rx="1.5" ry="1.2"
-                                    fill={['#fecdd3', '#bae6fd', '#e9d5ff'][prop.variant]} // Pastel pink, blue, purple
-                                />
-                                {/* Simple detail line */}
-                                <path d="M -0.8,0 L 0.8,0" stroke="white" strokeWidth="0.3" opacity="0.5" />
-                            </g>
-                        )}
-                    </g>
-                ))}
+                            {/* --- DRIFTWOOD Voxel --- */}
+                            {p.type === 'driftwood' && (
+                                <g transform={`rotate(${p.rotation})`}>
+                                    <rect x="-12" y="3" width="24" height="8" rx="3" fill={COLORS.SHADOW} />
+                                    <rect x="-12" y="-1" width="24" height="8" rx="3" fill={COLORS.WOOD_SIDE} />
+                                    <rect x="-12" y="-5" width="24" height="8" rx="3" fill={COLORS.WOOD_TOP} />
+                                </g>
+                            )}
+                        </g>
+                    );
+                })}
             </svg>
+
+            {/* Subtle vignette for focus */}
+            <div style={{
+                position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+                boxShadow: 'inset 0 0 60px rgba(0,0,0,0.1)', pointerEvents: 'none', borderRadius: '16px'
+            }} />
         </div>
     );
 }

@@ -6,6 +6,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getEmotion } from '@/lib/emotions';
 import { getLevelColor, getLevelHue } from '@/lib/levelColors';
+import { VoxelScene } from '@/components/voxels/VoxelPrimitives';
+import { VoxelCloud } from '@/components/voxels/VoxelShapes';
 
 export default function DashboardPage() {
     const [world, setWorld] = useState<BiomeConfig[]>([]);
@@ -18,33 +20,69 @@ export default function DashboardPage() {
     const handleLevelClick = (levelId: number) => {
         const color = getLevelColor(levelId);
         const hue = getLevelHue(levelId);
-
-        // Mock name generation based on ID for consistency
         const name = getEmotion((levelId * 15) % 360, 50);
-
         router.push(`/training/${levelId}?hue=${hue}&color=${encodeURIComponent(color)}&name=${encodeURIComponent(name)}`);
     };
 
-    if (world.length === 0) return null; // Prevent mismatch during initial render
+    if (world.length === 0) return null;
 
     return (
-        <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center', backgroundColor: '#000', minHeight: '100vh', position: 'relative' }}>
-            <header style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100, padding: '20px', pointerEvents: 'none' }}>
+        <div style={{
+            width: '100%',
+            maxWidth: '100%',
+            paddingLeft: 'var(--sidebar-width)', // Push content by sidebar width
+            textAlign: 'center',
+            backgroundColor: '#f0fdf4',
+            backgroundImage: `radial-gradient(#00a896 1px, transparent 1px)`,
+            backgroundSize: '30px 30px',
+            minHeight: '100vh',
+            position: 'relative',
+            overflowX: 'hidden'
+        }}>
+
+            {/* Header */}
+            <header style={{
+                position: 'fixed',
+                top: 20,
+                left: 0,
+                right: 0,
+                paddingLeft: 'var(--sidebar-width)', // Match main content padding to center relative to visual area
+                zIndex: 90,
+                pointerEvents: 'none',
+                display: 'flex',
+                justifyContent: 'center'
+            }}>
                 <h1 className="title" style={{
-                    color: 'white',
-                    textShadow: '0 4px 0 #000',
+                    color: 'var(--text-color)',
+                    fontSize: '2rem',
                     margin: 0,
-                    display: 'inline-block',
-                    padding: '10px 20px',
-                    backgroundColor: 'rgba(0,0,0,0.5)',
+                    padding: '12px 32px',
+                    backgroundColor: 'var(--white)',
                     borderRadius: '20px',
-                    backdropFilter: 'blur(10px)'
+                    boxShadow: '0 8px 0 rgba(0,0,0,0.1)',
+                    border: '2px solid var(--border-color)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px'
                 }}>
-                    My Journey
+                    <span>🗺️</span> My Journey
                 </h1>
             </header>
 
-            <div style={{ paddingBottom: '0' }}>
+            {/* Voxel Decorations (Floating Clouds) */}
+            <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0, pointerEvents: 'none' }}>
+                <div style={{ position: 'absolute', top: '10%', left: '10%', animation: 'float 12s ease-in-out infinite' }}>
+                    <VoxelScene><VoxelCloud /></VoxelScene>
+                </div>
+                <div style={{ position: 'absolute', top: '20%', right: '15%', animation: 'float 15s ease-in-out infinite reverse' }}>
+                    <VoxelScene><VoxelCloud /></VoxelScene>
+                </div>
+                <div style={{ position: 'absolute', bottom: '10%', left: '25%', opacity: 0.8, transform: 'scale(0.8)', animation: 'float 20s ease-in-out infinite' }}>
+                    <VoxelScene><VoxelCloud /></VoxelScene>
+                </div>
+            </div>
+
+            <div style={{ paddingBottom: '100px', paddingTop: '100px', position: 'relative', zIndex: 1 }}>
                 {world.map((biome, index) => (
                     <BiomeSection
                         key={index}

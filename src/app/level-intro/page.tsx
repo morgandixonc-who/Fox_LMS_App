@@ -24,6 +24,7 @@ function LevelIntroContent() {
             targetColor={color}
             hue={hue}
             onClose={handleClose}
+            onStart={() => console.log('Start level')}
         />
     );
 }
